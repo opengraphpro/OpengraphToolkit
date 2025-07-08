@@ -19,7 +19,7 @@ OpenGraph Pro is a full-stack web application for analyzing and generating OpenG
 - **Language**: TypeScript with ES modules
 - **Database**: PostgreSQL via Drizzle ORM
 - **Web Scraping**: Puppeteer for page content extraction
-- **AI Integration**: OpenAI GPT-4o for SEO analysis and suggestions
+- **AI Integration**: Google Gemini 1.5 Flash for SEO analysis and suggestions
 - **Session Management**: Express sessions with PostgreSQL store
 
 ### Development Setup
@@ -40,7 +40,7 @@ OpenGraph Pro is a full-stack web application for analyzing and generating OpenG
   - Content analysis for SEO optimization
 
 ### AI-Powered SEO Analysis
-- **Provider**: OpenAI GPT-4o
+- **Provider**: Google Gemini 1.5 Flash
 - **Function**: Analyzes extracted metadata and provides optimization suggestions
 - **Output**: Structured recommendations for title length, description optimization, image presence, and tag completeness
 
@@ -59,7 +59,7 @@ OpenGraph Pro is a full-stack web application for analyzing and generating OpenG
 1. **URL Submission**: User enters URL in the URLInput component
 2. **Analysis Request**: Frontend sends POST request to `/api/analyze`
 3. **Web Scraping**: Backend uses Puppeteer to extract page metadata
-4. **AI Analysis**: OpenAI analyzes extracted data for SEO optimization
+4. **AI Analysis**: Google Gemini analyzes extracted data for SEO optimization
 5. **Data Storage**: Analysis results stored in PostgreSQL via Drizzle ORM
 6. **Frontend Display**: Results displayed in TagDisplay, SocialPreviews, and AISuggestions components
 7. **Tag Generation**: Optional manual tag creation via TagGenerator component
@@ -70,7 +70,7 @@ OpenGraph Pro is a full-stack web application for analyzing and generating OpenG
 - **@neondatabase/serverless**: PostgreSQL database connectivity
 - **drizzle-orm**: Type-safe database ORM
 - **puppeteer**: Web scraping and page analysis
-- **openai**: AI-powered SEO analysis
+- **@google/generative-ai**: AI-powered SEO analysis with Gemini
 - **@tanstack/react-query**: Client-side state management
 - **@radix-ui/react-***: Accessible UI component primitives
 
@@ -90,19 +90,24 @@ OpenGraph Pro is a full-stack web application for analyzing and generating OpenG
 
 ### Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string
-- `OPENAI_API_KEY`: OpenAI API authentication
+- `GEMINI_API_KEY`: Google Gemini API authentication
 - `NODE_ENV`: Environment configuration
 
 ### Hosting Requirements
 - Node.js runtime environment
 - PostgreSQL database
 - Static file serving capability
-- External API access for OpenAI
+- External API access for Google Gemini
 
 ## Changelog
 
 Changelog:
-- July 08, 2025. Initial setup
+- July 08, 2025: Initial setup with React frontend and Express backend
+- July 08, 2025: Implemented Puppeteer web scraping with HTTP fallback
+- July 08, 2025: Integrated Google Gemini AI for SEO analysis and suggestions
+- July 08, 2025: Added multi-platform social media previews (Facebook, Twitter, LinkedIn)
+- July 08, 2025: Created tag generator with JSON-LD support
+- July 08, 2025: Implemented mobile-responsive design
 
 ## User Preferences
 
