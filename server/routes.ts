@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { urlAnalyzerService } from "./services/urlAnalyzer";
-import { openAIService } from "./services/openai";
+import { geminiService } from "./services/gemini";
 import { 
   urlAnalysisRequestSchema, 
   tagGeneratorRequestSchema,
@@ -75,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { url, title, description, content, type } = req.body;
       
-      const improvements = await openAIService.generateImprovedTags({
+      const improvements = await geminiService.generateImprovedTags({
         url,
         title,
         description,

@@ -39,6 +39,10 @@ export class MemStorage implements IStorage {
       id,
       title: insertAnalysis.title || null,
       description: insertAnalysis.description || null,
+      openGraphTags: insertAnalysis.openGraphTags || {},
+      twitterTags: insertAnalysis.twitterTags || {},
+      jsonLd: insertAnalysis.jsonLd || [],
+      aiSuggestions: insertAnalysis.aiSuggestions || [],
       createdAt: new Date(),
     };
     this.urlAnalyses.set(id, analysis);

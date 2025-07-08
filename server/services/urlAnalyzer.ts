@@ -1,5 +1,6 @@
 import { puppeteerService } from './puppeteer';
-import { openAIService } from './openai';
+import { httpAnalyzerService } from './httpAnalyzer';
+import { geminiService } from './gemini';
 import { UrlAnalysisResult, OpenGraphTags, TwitterTags, AISuggestion } from '@shared/schema';
 
 export class UrlAnalyzerService {
@@ -8,8 +9,14 @@ export class UrlAnalyzerService {
       // Validate URL
       new URL(url);
       
-      // Use Puppeteer to analyze the page
-      const pageData = await puppeteerService.analyzePage(url);
+      // Try Puppeteer first, fallback to HTTP analyzer if it fails
+      let pageData;
+      try {
+        pageData = await puppeteerService.analyzePage(url);
+      } catch (puppeteerError) {
+        console.log('Puppeteer failed, falling back to HTTP analyzer:', puppeteerError.message);
+        pageData = await httpAnalyzerService.analyzePage(url);
+      }
       
       // Extract OpenGraph tags
       const openGraphTags: OpenGraphTags = {
@@ -31,7 +38,7 @@ export class UrlAnalyzerService {
       };
       
       // Get AI suggestions
-      const aiSuggestions = await openAIService.analyzeSEOTags({
+      const aiSuggestions = await geminiService.analyzeSEOTags({
         url,
         title: pageData.title,
         description: pageData.description,
@@ -51,7 +58,7 @@ export class UrlAnalyzerService {
       };
     } catch (error) {
       console.error('URL analysis error:', error);
-      throw new Error(`Failed to analyze URL: ${error.message}`);
+      throw new Error(`Failed to analyze URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
