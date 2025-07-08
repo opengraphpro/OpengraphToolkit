@@ -25,14 +25,13 @@ export class GeminiService {
         Twitter Tags: ${JSON.stringify(data.twitterTags)}
         Content Preview: ${data.content.substring(0, 1000)}
         
-        Please provide SEO optimization suggestions in JSON format with the following structure:
+        Respond ONLY with valid JSON in this exact format:
         {
           "suggestions": [
             {
-              "type": "optimization" | "improvement",
-              "level": "success" | "warning" | "error",
-              "message": "description of the issue or success",
-              "suggestion": "specific improvement recommendation (optional)"
+              "type": "optimization",
+              "level": "warning",
+              "message": "Your optimization suggestion here"
             }
           ]
         }
@@ -52,9 +51,52 @@ export class GeminiService {
 
       try {
         const parsed = JSON.parse(text);
-        return parsed.suggestions || [];
+        if (parsed.suggestions && Array.isArray(parsed.suggestions)) {
+          return parsed.suggestions;
+        }
+        // If suggestions array is missing, try to extract from different format
+        if (parsed.analysis && Array.isArray(parsed.analysis)) {
+          return parsed.analysis.map((item: any) => ({
+            type: item.type || 'optimization',
+            level: item.level || 'warning',
+            message: item.message || item.text || 'AI analysis completed',
+            suggestion: item.suggestion
+          }));
+        }
+        // Return parsed content as single suggestion if it's a string
+        return [{
+          type: 'optimization',
+          level: 'success',
+          message: typeof parsed === 'string' ? parsed : 'AI analysis completed successfully'
+        }];
       } catch (parseError) {
-        // If JSON parsing fails, return a basic suggestion
+        // If JSON parsing fails, try to parse as partial JSON
+        const cleanText = text.replace(/```json|```/g, '').trim();
+        if (cleanText.includes('"suggestions"')) {
+          // Try to extract suggestions from partial JSON
+          const match = cleanText.match(/"suggestions":\s*\[([^\]]+)\]/);
+          if (match) {
+            try {
+              const suggestionsText = '[' + match[1] + ']';
+              const suggestions = JSON.parse(suggestionsText);
+              return suggestions.map((s: any) => ({
+                type: s.type || 'optimization',
+                level: s.level || 'success',
+                message: s.message || 'AI analysis completed'
+              }));
+            } catch (e) {
+              // Continue to fallback
+            }
+          }
+        }
+        
+        if (cleanText.length > 0) {
+          return [{
+            type: 'optimization',
+            level: 'success',
+            message: cleanText.substring(0, 200) + (cleanText.length > 200 ? '...' : '')
+          }];
+        }
         return [{
           type: 'optimization',
           level: 'warning',

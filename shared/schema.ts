@@ -49,7 +49,7 @@ export const urlAnalysisRequestSchema = z.object({
 export const tagGeneratorRequestSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
-  image: z.string().url().optional(),
+  image: z.string().optional().or(z.literal("")),
   url: z.string().url(),
   siteName: z.string().optional(),
   type: z.enum(["website", "article", "product", "video"]),
