@@ -3,57 +3,76 @@ import { httpAnalyzerService } from './httpAnalyzer';
 import { geminiService } from './gemini';
 import { UrlAnalysisResult, OpenGraphTags, TwitterTags, AISuggestion } from '@shared/schema';
 
+const DEFAULT_IMAGE_URL = 'https://example.com/default.jpg';
+const DEFAULT_TITLE = 'Untitled';
+const DEFAULT_DESCRIPTION = 'No description available.';
+const DEFAULT_OG_TYPE = 'website';
+const DEFAULT_OG_LOCALE = 'en_US';
+const DEFAULT_TWITTER_CARD = 'summary_large_image';
+
 export class UrlAnalyzerService {
   async analyzeUrl(url: string): Promise<UrlAnalysisResult> {
     try {
-      // Validate URL
-      new URL(url);
-      
-      // Try Puppeteer first, fallback to HTTP analyzer if it fails
+      const parsedURL = new URL(url);
+
       let pageData;
       try {
         pageData = await puppeteerService.analyzePage(url);
       } catch (puppeteerError) {
-        console.log('Puppeteer failed, falling back to HTTP analyzer:', puppeteerError.message);
+        if (puppeteerError && typeof puppeteerError === 'object' && 'message' in puppeteerError) {
+          console.log('Puppeteer failed, falling back to HTTP analyzer:', (puppeteerError as { message: string }).message);
+        } else {
+          console.log('Puppeteer failed, falling back to HTTP analyzer:', puppeteerError);
+        }
         pageData = await httpAnalyzerService.analyzePage(url);
       }
-      
-      // Extract OpenGraph tags
+
+      const ogTags = pageData.openGraphTags || {};
+      const twTags = pageData.twitterTags || {};
+
+      const validOgTypes = ["website", "article", "product", "profile"] as const;
+      type OpenGraphType = (typeof validOgTypes)[number];
+
+      const rawType = ogTags["og:type"];
+      const safeType: OpenGraphType = validOgTypes.includes(rawType as any)
+        ? (rawType as OpenGraphType)
+        : "website";
+
       const openGraphTags: OpenGraphTags = {
-        title: pageData.openGraphTags['og:title'],
-        description: pageData.openGraphTags['og:description'],
-        image: pageData.openGraphTags['og:image'],
-        url: pageData.openGraphTags['og:url'],
-        type: pageData.openGraphTags['og:type'],
-        siteName: pageData.openGraphTags['og:site_name'],
+        title: ogTags["og:title"] || pageData.title || DEFAULT_TITLE,
+        description: ogTags["og:description"] || pageData.description || DEFAULT_DESCRIPTION,
+        image: ogTags["og:image"] || DEFAULT_IMAGE_URL,
+        url: ogTags["og:url"] || parsedURL.toString(),
+        type: safeType,
+        siteName: ogTags["og:site_name"] || parsedURL.hostname,
+        locale: ogTags["og:locale"] || DEFAULT_OG_LOCALE,
+        imageAlt: ogTags["og:image:alt"] || 'Preview image'
       };
-      
-      // Extract Twitter tags
+
       const twitterTags: TwitterTags = {
-        card: pageData.twitterTags['twitter:card'],
-        title: pageData.twitterTags['twitter:title'],
-        description: pageData.twitterTags['twitter:description'],
-        image: pageData.twitterTags['twitter:image'],
-        site: pageData.twitterTags['twitter:site'],
+        card: twTags['twitter:card'] || DEFAULT_TWITTER_CARD,
+        title: twTags['twitter:title'] || openGraphTags.title,
+        description: twTags['twitter:description'] || openGraphTags.description,
+        image: twTags['twitter:image'] || openGraphTags.image,
+        site: twTags['twitter:site'] || `@${parsedURL.hostname.replace('www.', '')}`
       };
-      
-      // Get AI suggestions
-      const aiSuggestions = await geminiService.analyzeSEOTags({
+
+      const aiSuggestions: AISuggestion[] = await geminiService.analyzeSEOTags({
         url,
         title: pageData.title,
         description: pageData.description,
         content: pageData.content,
-        openGraphTags: pageData.openGraphTags,
-        twitterTags: pageData.twitterTags,
+        openGraphTags: ogTags,
+        twitterTags: twTags,
       });
-      
+
       return {
         url,
-        title: pageData.title,
-        description: pageData.description,
+        title: pageData.title || DEFAULT_TITLE,
+        description: pageData.description || DEFAULT_DESCRIPTION,
         openGraphTags,
         twitterTags,
-        jsonLd: pageData.jsonLd,
+        jsonLd: pageData.jsonLd || [],
         aiSuggestions,
       };
     } catch (error) {
@@ -71,7 +90,7 @@ export class UrlAnalyzerService {
     type: string;
   }): string {
     const { title, description, image, url, siteName, type } = data;
-    
+
     let html = `<!-- OpenGraph Meta Tags -->\n`;
     html += `<meta property="og:title" content="${this.escapeHtml(title)}" />\n`;
     html += `<meta property="og:description" content="${this.escapeHtml(description)}" />\n`;
@@ -83,7 +102,7 @@ export class UrlAnalyzerService {
     if (siteName) {
       html += `<meta property="og:site_name" content="${this.escapeHtml(siteName)}" />\n`;
     }
-    
+
     html += `\n<!-- Twitter Card Meta Tags -->\n`;
     html += `<meta name="twitter:card" content="summary_large_image" />\n`;
     html += `<meta name="twitter:title" content="${this.escapeHtml(title)}" />\n`;
@@ -91,7 +110,7 @@ export class UrlAnalyzerService {
     if (image) {
       html += `<meta name="twitter:image" content="${this.escapeHtml(image)}" />\n`;
     }
-    
+
     html += `\n<!-- JSON-LD Schema -->\n`;
     html += `<script type="application/ld+json">\n`;
     html += JSON.stringify({
@@ -104,13 +123,13 @@ export class UrlAnalyzerService {
       ...(siteName && { "publisher": { "@type": "Organization", "name": siteName } })
     }, null, 2);
     html += `\n</script>`;
-    
+
     return html;
   }
 
   private escapeHtml(text: string): string {
-    const div = { innerHTML: text } as any;
-    return div.innerHTML
+    return text
+      .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;')
       .replace(/</g, '&lt;')
