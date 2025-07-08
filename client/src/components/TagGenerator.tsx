@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Download, Wand2, Copy, CheckCircle } from "lucide-react";
+import TagPreview from "@/components/TagPreview";
 
 interface TagGeneratorState {
   title: string;
@@ -147,7 +148,18 @@ export default function TagGenerator() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          {/* Live Preview Section */}
+          <TagPreview 
+            title={formData.title}
+            description={formData.description}
+            image={formData.image}
+            url={formData.url}
+            siteName={formData.siteName}
+            type={formData.type}
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Form Section */}
           <div className="space-y-6">
             <div className="space-y-4">
@@ -323,6 +335,7 @@ export default function TagGenerator() {
                 Validate
               </Button>
             </div>
+          </div>
           </div>
         </div>
       </CardContent>

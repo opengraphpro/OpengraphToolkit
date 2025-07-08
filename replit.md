@@ -108,6 +108,7 @@ Changelog:
 - July 08, 2025: Added multi-platform social media previews (Facebook, Twitter, LinkedIn)
 - July 08, 2025: Created tag generator with JSON-LD support
 - July 08, 2025: Implemented mobile-responsive design
+- July 08, 2025: Added live tag preview with multi-platform social media visualization
 
 ## User Preferences
 
