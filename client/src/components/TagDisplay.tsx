@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
-import { UrlAnalysis } from "@shared/schema";
+import { RefreshCw, Copy } from "lucide-react";
+import { UrlAnalysisResult } from "@shared/schema";
 
 interface TagDisplayProps {
-  analysis: UrlAnalysis;
+  analysis: UrlAnalysisResult;
 }
 
 export default function TagDisplay({ analysis }: TagDisplayProps) {
@@ -15,6 +15,25 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
     console.log("Refresh tags");
   };
 
+  const handleCopyTags = () => {
+    const tagsToCopy = {
+      openGraphTags,
+      twitterTags,
+      jsonLd,
+    };
+
+    const text = JSON.stringify(tagsToCopy, null, 2);
+
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log("Tags copied to clipboard");
+        // Optionally use toast here
+      })
+      .catch((err) => {
+        console.error("Failed to copy tags", err);
+      });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -22,15 +41,25 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
           <CardTitle className="text-lg font-semibold text-gray-900">
             Extracted Tags
           </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={handleRefresh}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleCopyTags}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleRefresh}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
+
       <CardContent>
         <div className="space-y-4">
           {/* OpenGraph Tags */}

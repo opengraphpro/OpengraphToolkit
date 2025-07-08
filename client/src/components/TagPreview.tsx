@@ -102,10 +102,10 @@ export default function TagPreview({
                   <div className="text-xs text-gray-500 mb-1 uppercase">
                     {getDomain(url)}
                   </div>
-                  <div className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                  <div className="text-sm font-medium text-gray-900 mb-1 ">
                     {title}
                   </div>
-                  <div className="text-xs text-gray-600 line-clamp-2">
+                  <div className="text-xs text-gray-600 ">
                     {description}
                   </div>
                 </div>
@@ -126,10 +126,10 @@ export default function TagPreview({
                   }}
                 />
                 <div className="p-3">
-                  <div className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                  <div className="text-sm font-medium text-gray-900 mb-1 ">
                     {title}
                   </div>
-                  <div className="text-xs text-gray-600 mb-2 line-clamp-2">
+                  <div className="text-xs text-gray-600 mb-2 ">
                     {description}
                   </div>
                   <div className="text-xs text-gray-500 flex items-center gap-1">
@@ -158,7 +158,7 @@ export default function TagPreview({
                     <div className="text-sm font-medium text-gray-900 mb-1 line-clamp-1">
                       {title}
                     </div>
-                    <div className="text-xs text-gray-600 mb-2 line-clamp-2">
+                    <div className="text-xs text-gray-600 mb-2 ">
                       {description}
                     </div>
                     <div className="text-xs text-gray-500">
