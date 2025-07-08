@@ -62,13 +62,11 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
                 { key: "og:url", value: openGraphTags?.url },
                 { key: "og:type", value: openGraphTags?.type },
                 { key: "og:site_name", value: openGraphTags?.siteName },
-                { key: "og:site_name", value: openGraphTags.siteName },
-                { key: "og:locale", value: openGraphTags.locale },
-                { key: "og:image:alt", value: openGraphTags.imageAlt }
-
-              ].map(({ key, value }) => (
+                { key: "og:locale", value: openGraphTags?.locale },
+                { key: "og:image:alt", value: openGraphTags?.imageAlt }
+              ].map(({ key, value }, idx) => (
                 <div
-                  key={key}
+                  key={`${key}-${value}-${idx}`}
                   className="flex justify-between items-start py-1 border-b border-gray-100 last:border-b-0"
                 >
                   <span className="text-gray-600">{key}</span>
@@ -96,9 +94,9 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
                 { key: "twitter:description", value: twitterTags?.description },
                 { key: "twitter:image", value: twitterTags?.image },
                 { key: "twitter:site", value: twitterTags?.site },
-              ].map(({ key, value }) => (
+              ].map(({ key, value }, idx) => (
                 <div
-                  key={key}
+                  key={`${key}-${value}-${idx}`}
                   className="flex justify-between items-start py-1 border-b border-gray-100 last:border-b-0"
                 >
                   <span className="text-gray-600">{key}</span>
