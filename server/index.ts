@@ -12,9 +12,10 @@ app.use(express.json());
 
 app.use(routes);
 
-app.listen(5000, () => {
-  console.log("Server running on http://localhost:5000");
-});
+
+// app.listen(5001, () => {
+//   console.log("Server running on http://localhost:5001");
+// });
 
 const PORT = newFunction();
 
@@ -81,8 +82,8 @@ app.use((req, res, next) => {
   });
 })();
 function newFunction() {
-  const app = express();
-  const PORT = 5000;
+  // const app = express();
+  const PORT = 5001;
   return PORT;
 }
 
