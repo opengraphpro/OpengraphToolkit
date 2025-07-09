@@ -66,15 +66,16 @@ export default function Home() {
         {/* Results Section */}
         {currentAnalysis && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <TagDisplay analysis={{
+            <TagDisplay
+            tags={[]} favicon={""} {...{
               ...currentAnalysis,
-              title: currentAnalysis.title ?? undefined,
-              description: currentAnalysis.description ?? undefined,
+              title: currentAnalysis.title ?? "",
+              description: currentAnalysis.description ?? "",
               openGraphTags: currentAnalysis.openGraphTags as import("@shared/schema").OpenGraphTags,
               twitterTags: currentAnalysis.twitterTags as import("@shared/schema").TwitterTags,
               jsonLd: currentAnalysis.jsonLd as import("@shared/schema").JsonLdSchema[],
               aiSuggestions: Array.isArray(currentAnalysis.aiSuggestions) ? currentAnalysis.aiSuggestions as import("@shared/schema").AISuggestion[] : [],
-            }} />
+            }}            />
             <AISuggestions 
               suggestions={Array.isArray(currentAnalysis.aiSuggestions) ? currentAnalysis.aiSuggestions : []}
               url={currentAnalysis.url}

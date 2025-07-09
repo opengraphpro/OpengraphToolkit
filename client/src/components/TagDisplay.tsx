@@ -1,14 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Copy } from "lucide-react";
-import { UrlAnalysisResult } from "@shared/schema";
 
 interface TagDisplayProps {
-  analysis: UrlAnalysisResult;
+  title: string;
+  description: string;
+  url: string;
+  showCopyButton?: boolean;
 }
 
-export default function TagDisplay({ analysis }: TagDisplayProps) {
-  const { openGraphTags, twitterTags, jsonLd } = analysis;
+export default function TagDisplay({
+  title,
+  description,
+  url,
+  showCopyButton = true,
+}: TagDisplayProps) {
+  const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
 
   const handleRefresh = () => {
     console.log("Refresh tags");
@@ -16,9 +23,10 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
 
   const handleCopyTags = () => {
     const tagsToCopy = {
-      openGraphTags,
-      twitterTags,
-      jsonLd,
+      title,
+      description,
+      favicon,
+      url,
     };
 
     const text = JSON.stringify(tagsToCopy, null, 2);
@@ -35,14 +43,16 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
           <CardTitle className="text-lg font-semibold text-gray-900">
             Extracted Tags
           </CardTitle>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={handleCopyTags}>
-              <Copy className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleRefresh}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
+          {showCopyButton && (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={handleCopyTags}>
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleRefresh}>
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </CardHeader>
 
@@ -56,14 +66,14 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
             </h4>
             <div className="space-y-2 text-sm">
               {[
-                { key: "og:title", value: openGraphTags?.title },
-                { key: "og:description", value: openGraphTags?.description },
-                { key: "og:image", value: openGraphTags?.image },
-                { key: "og:url", value: openGraphTags?.url },
-                { key: "og:type", value: openGraphTags?.type },
-                { key: "og:site_name", value: openGraphTags?.siteName },
-                { key: "og:locale", value: openGraphTags?.locale },
-                { key: "og:image:alt", value: openGraphTags?.imageAlt }
+                { key: "og:title", value: title },
+                { key: "og:description", value: description },
+                { key: "og:image", value: favicon },
+                { key: "og:url", value: url },
+                { key: "og:type", value: "website" },
+                { key: "og:site_name", value: "My Site" },
+                { key: "og:locale", value: "en_US" },
+                { key: "og:image:alt", value: "Image description" }
               ].map(({ key, value }, idx) => (
                 <div
                   key={`${key}-${value}-${idx}`}
@@ -89,11 +99,11 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
             </h4>
             <div className="space-y-2 text-sm">
               {[
-                { key: "twitter:card", value: twitterTags?.card },
-                { key: "twitter:title", value: twitterTags?.title },
-                { key: "twitter:description", value: twitterTags?.description },
-                { key: "twitter:image", value: twitterTags?.image },
-                { key: "twitter:site", value: twitterTags?.site },
+                { key: "twitter:card", value: "summary_large_image" },
+                { key: "twitter:title", value: title },
+                { key: "twitter:description", value: description },
+                { key: "twitter:image", value: favicon },
+                { key: "twitter:site", value: "@mysite" },
               ].map(({ key, value }, idx) => (
                 <div
                   key={`${key}-${value}-${idx}`}
@@ -119,9 +129,22 @@ export default function TagDisplay({ analysis }: TagDisplayProps) {
             </h4>
             <div className="bg-gray-50 rounded p-3 text-sm">
               <pre className="text-gray-700 font-mono overflow-x-auto">
-                {jsonLd && jsonLd.length > 0
-                  ? JSON.stringify(jsonLd[0], null, 2)
-                  : "No JSON-LD schema found"}
+{`{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "${title}",
+  "description": "${description}",
+  "url": "${url}",
+  "image": "${favicon}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "My Site",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "${favicon}"
+    }
+  }
+}`}
               </pre>
             </div>
           </div>

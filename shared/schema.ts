@@ -46,7 +46,7 @@ export type UrlAnalysis = typeof urlAnalyses.$inferSelect;
 export type InsertGeneratedTags = z.infer<typeof insertGeneratedTagsSchema>;
 export type GeneratedTags = typeof generatedTags.$inferSelect;
 
-// API REQUEST TYPES
+// API REQUEST SCHEMAS
 export const urlAnalysisRequestSchema = z.object({
   url: z.string().url(),
 });
@@ -64,18 +64,16 @@ export type UrlAnalysisRequest = z.infer<typeof urlAnalysisRequestSchema>;
 export type TagGeneratorRequest = z.infer<typeof tagGeneratorRequestSchema>;
 
 // METADATA INTERFACES
+
 export interface OpenGraphTags {
-  title: string;
-  description: string;
-  image: string;
-  url: string;
-  type: 'website' | 'article' | 'product' | 'profile';
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
   siteName?: string;
+  type?: string;
   locale?: string;
   imageAlt?: string;
-  audio?: string;
-  video?: string;
-  determiner?: string;
 }
 
 export interface TwitterTags {
@@ -111,4 +109,15 @@ export interface UrlAnalysisResult {
   twitterTags: TwitterTags;
   jsonLd: JsonLdSchema[];
   aiSuggestions: AISuggestion[];
+}
+export interface TagGenerationResult {
+  title: string;
+  description: string;
+  image?: string;
+  url: string;
+  siteName?: string;
+  type: string;
+  generatedCode: string;
+  locale?: string;
+  imageAlt?: string;
 }
