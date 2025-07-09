@@ -1,10 +1,10 @@
-import { 
-  urlAnalyses, 
-  generatedTags, 
-  type UrlAnalysis, 
-  type InsertUrlAnalysis, 
-  type GeneratedTags, 
-  type InsertGeneratedTags 
+import {
+  urlAnalyses,
+  generatedTags,
+  type UrlAnalysis,
+  type InsertUrlAnalysis,
+  type GeneratedTags,
+  type InsertGeneratedTags,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -12,7 +12,7 @@ export interface IStorage {
   createUrlAnalysis(analysis: InsertUrlAnalysis): Promise<UrlAnalysis>;
   getUrlAnalysis(id: number): Promise<UrlAnalysis | undefined>;
   getUrlAnalysisByUrl(url: string): Promise<UrlAnalysis | undefined>;
-  
+
   // Generated Tags methods
   createGeneratedTags(tags: InsertGeneratedTags): Promise<GeneratedTags>;
   getGeneratedTags(id: number): Promise<GeneratedTags | undefined>;
@@ -20,69 +20,66 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private urlAnalyses: Map<number, UrlAnalysis>;
-  private generatedTags: Map<number, GeneratedTags>;
-  private currentUrlAnalysisId: number;
-  private currentGeneratedTagsId: number;
+  private urlAnalysesMap = new Map<number, UrlAnalysis>();
+  private generatedTagsMap = new Map<number, GeneratedTags>();
+  private nextUrlAnalysisId = 1;
+  private nextGeneratedTagsId = 1;
+  generatedTags: any;
 
-  constructor() {
-    this.urlAnalyses = new Map();
-    this.generatedTags = new Map();
-    this.currentUrlAnalysisId = 1;
-    this.currentGeneratedTagsId = 1;
-  }
-
-  async createUrlAnalysis(insertAnalysis: InsertUrlAnalysis): Promise<UrlAnalysis> {
-    const id = this.currentUrlAnalysisId++;
+  async createUrlAnalysis(data: InsertUrlAnalysis): Promise<UrlAnalysis> {
     const analysis: UrlAnalysis = {
-      ...insertAnalysis,
-      id,
-      title: insertAnalysis.title || null,
-      description: insertAnalysis.description || null,
-      openGraphTags: insertAnalysis.openGraphTags || {},
-      twitterTags: insertAnalysis.twitterTags || {},
-      jsonLd: insertAnalysis.jsonLd || [],
-      aiSuggestions: insertAnalysis.aiSuggestions || [],
+      id: this.nextUrlAnalysisId++,
+      url: data.url,
+      title: data.title ?? null,
+      description: data.description ?? null,
+      openGraphTags: data.openGraphTags ?? {},
+      twitterTags: data.twitterTags ?? {},
+      jsonLd: data.jsonLd ?? [],
+      aiSuggestions: data.aiSuggestions ?? [],
       createdAt: new Date(),
     };
-    this.urlAnalyses.set(id, analysis);
+
+    this.urlAnalysesMap.set(analysis.id, analysis);
     return analysis;
   }
 
   async getUrlAnalysis(id: number): Promise<UrlAnalysis | undefined> {
-    return this.urlAnalyses.get(id);
+    return this.urlAnalysesMap.get(id);
   }
 
   async getUrlAnalysisByUrl(url: string): Promise<UrlAnalysis | undefined> {
-    return Array.from(this.urlAnalyses.values()).find(
-      (analysis) => analysis.url === url
-    );
+    return [...this.urlAnalysesMap.values()].find((item) => item.url === url);
   }
 
-  async createGeneratedTags(insertTags: InsertGeneratedTags): Promise<GeneratedTags> {
-    const id = this.currentGeneratedTagsId++;
-    const tags: GeneratedTags = {
-      ...insertTags,
-      id,
-      image: insertTags.image || null,
-      siteName: insertTags.siteName || null,
-      generatedCode: insertTags.generatedCode || null,
+  async createGeneratedTags(data: InsertGeneratedTags): Promise<GeneratedTags> {
+    const tag: GeneratedTags = {
+      id: this.nextGeneratedTagsId++,
+      title: data.title,
+      description: data.description,
+      url: data.url,
+      type: data.type,
+      image: data.image ?? null,
+      siteName: data.siteName ?? null,
+      generatedCode: data.generatedCode ?? null,
       createdAt: new Date(),
+      locale: null,
+      imageAlt: null
     };
-    this.generatedTags.set(id, tags);
-    return tags;
+
+    this.generatedTagsMap.set(tag.id, tag);
+    return tag;
   }
 
   async getGeneratedTags(id: number): Promise<GeneratedTags | undefined> {
-    return this.generatedTags.get(id);
+    return this.generatedTagsMap.get(id);
   }
 
   async getRecentGeneratedTags(limit: number): Promise<GeneratedTags[]> {
-    const tags = Array.from(this.generatedTags.values())
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+    return [...this.generatedTags.values()] // ✅ This converts MapIterator to array
+      .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0))
       .slice(0, limit);
-    return tags;
   }
+
 }
 
 export const storage = new MemStorage();

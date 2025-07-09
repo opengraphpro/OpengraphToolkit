@@ -1,11 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Copy } from "lucide-react";
+import { OpenGraphTags, TwitterTags, JsonLdSchema, AISuggestion } from "@shared/schema";
 
-interface TagDisplayProps {
+export interface TagDisplayProps {
   title: string;
   description: string;
   url: string;
+  favicon?: string;
+  openGraphTags: OpenGraphTags;
+  twitterTags: TwitterTags;
+  jsonLd: JsonLdSchema[];
+  aiSuggestions: AISuggestion[];
+  keywords?: string[];
+  tags?: string[];
   showCopyButton?: boolean;
 }
 
@@ -13,9 +21,17 @@ export default function TagDisplay({
   title,
   description,
   url,
+  favicon,
+  openGraphTags,
+  twitterTags,
+  jsonLd,
+  aiSuggestions,
+  keywords = [],
+  tags = [],
   showCopyButton = true,
 }: TagDisplayProps) {
-  const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
+  const computedFavicon =
+    favicon || `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`;
 
   const handleRefresh = () => {
     console.log("Refresh tags");
@@ -25,13 +41,19 @@ export default function TagDisplay({
     const tagsToCopy = {
       title,
       description,
-      favicon,
       url,
+      favicon: computedFavicon,
+      openGraphTags,
+      twitterTags,
+      jsonLd,
+      keywords,
+      tags,
     };
 
     const text = JSON.stringify(tagsToCopy, null, 2);
 
-    navigator.clipboard.writeText(text)
+    navigator.clipboard
+      .writeText(text)
       .then(() => console.log("Tags copied to clipboard"))
       .catch((err) => console.error("Failed to copy tags", err));
   };
@@ -68,7 +90,7 @@ export default function TagDisplay({
               {[
                 { key: "og:title", value: title },
                 { key: "og:description", value: description },
-                { key: "og:image", value: favicon },
+                { key: "og:image", value: computedFavicon },
                 { key: "og:url", value: url },
                 { key: "og:type", value: "website" },
                 { key: "og:site_name", value: "My Site" },
@@ -102,7 +124,7 @@ export default function TagDisplay({
                 { key: "twitter:card", value: "summary_large_image" },
                 { key: "twitter:title", value: title },
                 { key: "twitter:description", value: description },
-                { key: "twitter:image", value: favicon },
+                { key: "twitter:image", value: computedFavicon },
                 { key: "twitter:site", value: "@mysite" },
               ].map(({ key, value }, idx) => (
                 <div
@@ -135,13 +157,13 @@ export default function TagDisplay({
   "name": "${title}",
   "description": "${description}",
   "url": "${url}",
-  "image": "${favicon}",
+  "image": "${computedFavicon}",
   "publisher": {
     "@type": "Organization",
     "name": "My Site",
     "logo": {
       "@type": "ImageObject",
-      "url": "${favicon}"
+      "url": "${computedFavicon}"
     }
   }
 }`}

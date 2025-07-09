@@ -1,27 +1,26 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Share2, HelpCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import URLInput from "@/components/URLInput";
 import TagDisplay from "@/components/TagDisplay";
 import AISuggestions from "@/components/AISuggestions";
 import SocialPreviews from "@/components/SocialPreviews";
 import TagGenerator from "@/components/TagGenerator";
 import ToolsSection from "@/components/ToolsSection";
-import { UrlAnalysis } from "@shared/schema";
+import { OpenGraphTags, TwitterTags, UrlAnalysis } from "@shared/schema";
 
 export default function Home() {
   const [currentAnalysis, setCurrentAnalysis] = useState<UrlAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleAnalysisComplete = (analysis: UrlAnalysis) => {
-    setCurrentAnalysis(analysis);
-    setIsAnalyzing(false);
-  };
-
   const handleAnalysisStart = () => {
     setIsAnalyzing(true);
     setCurrentAnalysis(null);
+  };
+
+  const handleAnalysisComplete = (analysis: UrlAnalysis) => {
+    setCurrentAnalysis(analysis);
+    setIsAnalyzing(false);
   };
 
   const handleAnalysisError = () => {
@@ -34,14 +33,10 @@ export default function Home() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900 flex items-center">
-                  <Share2 className="text-blue-500 mr-2" size={24} />
-                  OpenGraph Pro
-                </h1>
-              </div>
-            </div>
+            <h1 className="text-xl font-bold text-gray-900 flex items-center">
+              <Share2 className="text-blue-500 mr-2" size={24} />
+              OpenGraph Pro
+            </h1>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm">
                 <HelpCircle className="h-4 w-4" />
@@ -54,46 +49,57 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Main */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* URL Input Section */}
-        <URLInput 
+        <URLInput
           onAnalysisStart={handleAnalysisStart}
           onAnalysisComplete={handleAnalysisComplete}
           onAnalysisError={handleAnalysisError}
           isAnalyzing={isAnalyzing}
         />
 
-        {/* Results Section */}
         {currentAnalysis && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <TagDisplay
-            tags={[]} favicon={""} {...{
-              ...currentAnalysis,
-              title: currentAnalysis.title ?? "",
-              description: currentAnalysis.description ?? "",
-              openGraphTags: currentAnalysis.openGraphTags as import("@shared/schema").OpenGraphTags,
-              twitterTags: currentAnalysis.twitterTags as import("@shared/schema").TwitterTags,
-              jsonLd: currentAnalysis.jsonLd as import("@shared/schema").JsonLdSchema[],
-              aiSuggestions: Array.isArray(currentAnalysis.aiSuggestions) ? currentAnalysis.aiSuggestions as import("@shared/schema").AISuggestion[] : [],
-            }}            />
-            <AISuggestions 
-              suggestions={Array.isArray(currentAnalysis.aiSuggestions) ? currentAnalysis.aiSuggestions : []}
-              url={currentAnalysis.url}
-              title={currentAnalysis.title ?? undefined}
-              description={currentAnalysis.description ?? undefined}
-            />
-          </div>
-        )}
+          <>
+            {/* Tags & AI Suggestions */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <TagDisplay
+                // favicon prop removed because it does not exist on currentAnalysis
+                // Replace with a valid property or leave as empty array if none exists
+                                tags={[]}
+                title={currentAnalysis.title ?? ""}
+                description={currentAnalysis.description ?? ""}
+                url={currentAnalysis.url}
+                openGraphTags={currentAnalysis.openGraphTags as OpenGraphTags}
+                twitterTags={currentAnalysis.twitterTags as TwitterTags}
+                jsonLd={Array.isArray(currentAnalysis.jsonLd) ? currentAnalysis.jsonLd : []}
+                aiSuggestions={
+                  Array.isArray(currentAnalysis.aiSuggestions)
+                    ? currentAnalysis.aiSuggestions
+                    : []
+                }
+              />
 
-        {/* Social Media Previews */}
-        {currentAnalysis && (
-          <SocialPreviews analysis={currentAnalysis} />
+              <AISuggestions
+                suggestions={
+                  Array.isArray(currentAnalysis.aiSuggestions)
+                    ? currentAnalysis.aiSuggestions
+                    : []
+                }
+                url={currentAnalysis.url}
+                title={currentAnalysis.title ?? undefined}
+                description={currentAnalysis.description ?? undefined}
+              />
+            </div>
+
+            {/* Social Media Preview */}
+            <SocialPreviews analysis={currentAnalysis} />
+          </>
         )}
 
         {/* Tag Generator */}
         <TagGenerator />
 
-        {/* Tools Section */}
+        {/* Tools */}
         <ToolsSection />
       </main>
 
@@ -110,25 +116,25 @@ export default function Home() {
             <div>
               <h6 className="font-medium text-gray-900 mb-3">Tools</h6>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-gray-900 transition-colors">URL Debugger</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Tag Generator</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Bulk Processor</a></li>
+                <li><a href="#" className="hover:text-gray-900">URL Debugger</a></li>
+                <li><a href="#" className="hover:text-gray-900">Tag Generator</a></li>
+                <li><a href="#" className="hover:text-gray-900">Bulk Processor</a></li>
               </ul>
             </div>
             <div>
               <h6 className="font-medium text-gray-900 mb-3">Resources</h6>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">API Reference</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Best Practices</a></li>
+                <li><a href="#" className="hover:text-gray-900">Documentation</a></li>
+                <li><a href="#" className="hover:text-gray-900">API Reference</a></li>
+                <li><a href="#" className="hover:text-gray-900">Best Practices</a></li>
               </ul>
             </div>
             <div>
               <h6 className="font-medium text-gray-900 mb-3">Support</h6>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-gray-900 transition-colors">Status Page</a></li>
+                <li><a href="#" className="hover:text-gray-900">Help Center</a></li>
+                <li><a href="#" className="hover:text-gray-900">Contact Us</a></li>
+                <li><a href="#" className="hover:text-gray-900">Status Page</a></li>
               </ul>
             </div>
           </div>
