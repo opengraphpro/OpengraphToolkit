@@ -1,12 +1,6 @@
-'use server';
-
-import { urlAnalyzerService } from '../../server/services/urlAnalyzer';
 import { UrlAnalysisResult } from '@shared/schema';
 import { TagGenerationResult } from "@shared/schema";
-
-export async function generateTags(url: string): Promise<UrlAnalysisResult> {
-  return await urlAnalyzerService.analyzeUrl(url);
-}
+// Removed direct server import and function
 export async function generateTagsFromUrl(url: string): Promise<TagGenerationResult> {
   if (!url) {
     throw new Error('URL is required');
