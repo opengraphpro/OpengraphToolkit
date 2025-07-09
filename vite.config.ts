@@ -33,5 +33,10 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    hmr: {
+      overlay: false, // Disable runtime error overlay
+    },
   },
 });
+// This configuration sets up Vite for a React project with TypeScript support,
+// resolves aliases for easier imports, and configures the build output directory.

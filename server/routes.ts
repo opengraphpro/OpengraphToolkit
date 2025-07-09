@@ -2,6 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { urlAnalyzerService } from "./services/urlAnalyzer";
+import { puppeteerService } from './services/puppeteer';
+
 import { geminiService } from "./services/gemini";
 import { 
   urlAnalysisRequestSchema, 
