@@ -1,9 +1,9 @@
-import { UrlAnalysisResult } from '@shared/schema';
-import { TagGenerationResult } from "@shared/schema";
-// Removed direct server import and function
-export async function generateTagsFromUrl(url: string): Promise<TagGenerationResult> {
-  if (!url) {
-    throw new Error('URL is required');
+import { TagGenerationResult, TagGeneratorRequest } from "@shared/schema";
+
+export async function generateTagsFromUrl(input: TagGeneratorRequest): Promise<TagGenerationResult> {
+  // Basic validation
+  if (!input.url || !input.title || !input.description || !input.type) {
+    throw new Error('All required fields must be provided');
   }
 
   const response = await fetch("/api/generate", {
@@ -11,7 +11,7 @@ export async function generateTagsFromUrl(url: string): Promise<TagGenerationRes
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ url }),
+    body: JSON.stringify(input),
   });
 
   if (!response.ok) {
