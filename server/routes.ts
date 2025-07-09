@@ -10,6 +10,23 @@ import {
   tagGeneratorRequestSchema
 } from "@shared/schema";
 
+import express from "express";
+import { generateTagsFromMetadata } from "./services/generate";
+
+const router = express.Router();
+
+router.post("/api/generate", async (req, res) => {
+  try {
+    const result = await generateTagsFromMetadata(req.body);
+    res.json(result);
+  } catch (err: any) {
+    console.error("Error generating tags:", err);
+    res.status(400).json({ error: err.message || "Failed to generate tags" });
+  }
+});
+
+export default router;
+
 // Helper for consistent error handling
 function handleError(res: any, error: unknown, fallback = "Server Error") {
   console.error(error);

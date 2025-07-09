@@ -7,15 +7,18 @@ import AISuggestions from "@/components/AISuggestions";
 import SocialPreviews from "@/components/SocialPreviews";
 import TagGenerator from "@/components/TagGenerator";
 import ToolsSection from "@/components/ToolsSection";
+import MetadataEditor from "@/components/MetadataEditor";
 import { OpenGraphTags, TwitterTags, UrlAnalysis } from "@shared/schema";
 
 export default function Home() {
   const [currentAnalysis, setCurrentAnalysis] = useState<UrlAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [generatedHTML, setGeneratedHTML] = useState<string | null>(null);
 
   const handleAnalysisStart = () => {
     setIsAnalyzing(true);
     setCurrentAnalysis(null);
+    setGeneratedHTML(null);
   };
 
   const handleAnalysisComplete = (analysis: UrlAnalysis) => {
@@ -63,9 +66,6 @@ export default function Home() {
             {/* Tags & AI Suggestions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               <TagDisplay
-                // favicon prop removed because it does not exist on currentAnalysis
-                // Replace with a valid property or leave as empty array if none exists
-                                tags={[]}
                 title={currentAnalysis.title ?? ""}
                 description={currentAnalysis.description ?? ""}
                 url={currentAnalysis.url}
@@ -93,6 +93,25 @@ export default function Home() {
 
             {/* Social Media Preview */}
             <SocialPreviews analysis={currentAnalysis} />
+
+            {/* Metadata Editor */}
+            <MetadataEditor
+              initialTitle={currentAnalysis.title ?? ""}
+              initialDescription={currentAnalysis.description ?? ""}
+              initialImage={currentAnalysis.favicon ?? ""}
+              url={currentAnalysis.url}
+              onGenerated={setGeneratedHTML}
+            />
+
+            {/* Generated HTML Output */}
+            {generatedHTML && (
+              <div className="mt-8 border rounded-lg bg-white shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-4">Generated Tags</h3>
+                <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
+                  {generatedHTML}
+                </pre>
+              </div>
+            )}
           </>
         )}
 

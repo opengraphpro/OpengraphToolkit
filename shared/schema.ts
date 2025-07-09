@@ -8,6 +8,7 @@ export const urlAnalyses = pgTable("url_analyses", {
   url: text("url").notNull(),
   title: text("title"),
   description: text("description"),
+  favicon: text("favicon"), // ✅ ADD THIS
   openGraphTags: jsonb("og_tags"),
   twitterTags: jsonb("twitter_tags"),
   jsonLd: jsonb("json_ld"),

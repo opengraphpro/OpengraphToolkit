@@ -2,8 +2,21 @@ import express, { type Request, type Response, type NextFunction } from "express
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+
+import cors from "cors";
+import routes from "./routes";
+
 const app = express();
-const PORT = 5000;
+app.use(cors());
+app.use(express.json());
+
+app.use(routes);
+
+app.listen(5000, () => {
+  console.log("Server running on http://localhost:5000");
+});
+
+const PORT = newFunction();
 
 // Setup basic middleware
 app.use(express.json());
@@ -67,3 +80,9 @@ app.use((req, res, next) => {
     log(`Server running on http://localhost:${PORT}`);
   });
 })();
+function newFunction() {
+  const app = express();
+  const PORT = 5000;
+  return PORT;
+}
+
